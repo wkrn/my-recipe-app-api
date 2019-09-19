@@ -7,37 +7,29 @@ from core.models import Tag, Ingredient
 from recipe import serializers
 
 
-class TagViewSet(viewsets.GenericViewSet,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin):
-    """データベースのタグを扱う"""
-    authentication_classes = (TokenAuthentication,)
+class BaseRecipeAttrViewSet(viewsets.GenericViewSet,
+                            mixins.ListModelMixin,
+                            mixins.CreateModelMixin):
+    """ユーザが所有するrecipeの属性のviewset"""
+    authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        """現在の認証ユーザのみにオブジェクトを返す"""
+        return self.queryset.filter(user=self.request.user).order_by('-name')
+
+    def perform_create(self, serializer):
+        """新たなオブジェクトを作る"""
+        serializer.save(user=self.request.user)
+
+
+class TagViewSet(BaseRecipeAttrViewSet):
+    """データベースのタグを扱う"""
     queryset = Tag.objects.all()
     serializer_class = serializers.TagSerializer
 
-    def get_queryset(self):
-        """現在の認証済みユーザのオブジェクトのみを返す"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
 
-    def perform_create(self, serializer):
-        """新たなタグを作成する"""
-        serializer.save(user=self.request.user)
-
-
-class IngredientViewSet(viewsets.GenericViewSet,
-                        mixins.ListModelMixin,
-                        mixins.CreateModelMixin):
+class IngredientViewSet(BaseRecipeAttrViewSet):
     """データベースのingredientを扱う"""
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
     queryset = Ingredient.objects.all()
     serializer_class = serializers.IngredientSerializer
-
-    def get_queryset(self):
-        """現在の認証済みユーザのオブジェクトを返す"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
-
-    def perform_create(self, serializer):
-        """新たなingredientを作成"""
-        serializer.save(user=self.request.user)
