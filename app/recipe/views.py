@@ -3,7 +3,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from core.models import Tag, Ingredient, Recipe
-
 from recipe import serializers
 
 
@@ -45,3 +44,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """承認済みのユーザーにrecipeを取得する"""
         return self.queryset.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        """正しいserializer classを返す"""
+        if self.action == 'retrieve':
+            return serializers.RecipeDetailSerializer
+
+        return self.serializer_class
