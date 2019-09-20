@@ -7,7 +7,7 @@ class TagSerializer(serializers.ModelSerializer):
     """Tagオブジェクトのシリアライザー"""
     class Meta:
         model = Tag
-        fields = ('id', 'name')
+        fields = ('id', 'name', )
         read_only_fields = ('id', )
 
 
@@ -15,7 +15,7 @@ class IngredientSerializer(serializers.ModelSerializer):
     """ingredientオブジェクトのシリアライザー"""
     class Meta:
         model = Ingredient
-        fields = ('id', 'name')
+        fields = ('id', 'name', )
         read_only_fields = ('id', )
 
 
